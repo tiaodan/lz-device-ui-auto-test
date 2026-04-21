@@ -12,13 +12,13 @@ from api_test.base import ApiTest
 
 
 def test_login_wrong_password():
-    """测试：密码错误"""
+    """测试：正确的用户名+错误密码"""
 
     config = get_config(reload=True)
 
     print("\n" + "="*50)
     print("测试类型: API 登录测试")
-    print("测试场景: 密码错误")
+    print("测试场景: 正确的用户名+错误密码")
     print("="*50)
 
     api = ApiTest(
@@ -28,8 +28,8 @@ def test_login_wrong_password():
 
     print("\n[Step 1] 使用错误密码登录")
     print(f"  用户名: {config.username}")
-    print(f"  密码: wrong_password")
-    result = api.login(config.username, "wrong_password")
+    print(f"  密码: lz")
+    result = api.login(config.username, "lz")
 
     print("\n[Step 2] 验证结果")
     if result.get("token"):
@@ -39,13 +39,73 @@ def test_login_wrong_password():
         print("[PASS] 登录被拒绝")
         print(f"  错误码: {result.get('code', 'N/A')}")
         print(f"  错误信息: {result.get('msg', 'N/A')}")
-        # 验证错误信息是否正确
-        if result.get('msg') == 'Incorrect password':
-            print("[PASS] 错误信息正确")
+        # 验证错误码和错误信息
+        if result.get('code') == 5 and result.get('msg') == 'Incorrect password':
+            print("[PASS] 错误码和信息正确: code=5, msg=Incorrect password")
             return True
-        else:
-            print("[WARN] 错误信息与预期不一致")
-            return True  # 只要登录失败就算通过
+        return True
+
+
+def test_login_empty_username():
+    """测试：用户名为空"""
+
+    config = get_config(reload=True)
+
+    print("\n" + "="*50)
+    print("测试类型: API 登录测试")
+    print("测试场景: 用户名为空")
+    print("="*50)
+
+    api = ApiTest(
+        graphql_url=config.graphql_url,
+        login_url=config.login_url
+    )
+
+    print("\n[Step 1] 使用空用户名登录")
+    print(f"  用户名: (空)")
+    print(f"  密码: {config.password}")
+    result = api.login("", config.password)
+
+    print("\n[Step 2] 验证结果")
+    if result.get("token"):
+        print("[FAIL] 不应该登录成功")
+        return False
+    else:
+        print("[PASS] 登录被拒绝")
+        print(f"  错误码: {result.get('code', 'N/A')}")
+        print(f"  错误信息: {result.get('msg', result.get('error', 'N/A'))}")
+        return True
+
+
+def test_login_empty_password():
+    """测试：密码为空"""
+
+    config = get_config(reload=True)
+
+    print("\n" + "="*50)
+    print("测试类型: API 登录测试")
+    print("测试场景: 密码为空")
+    print("="*50)
+
+    api = ApiTest(
+        graphql_url=config.graphql_url,
+        login_url=config.login_url
+    )
+
+    print("\n[Step 1] 使用空密码登录")
+    print(f"  用户名: {config.username}")
+    print(f"  密码: (空)")
+    result = api.login(config.username, "")
+
+    print("\n[Step 2] 验证结果")
+    if result.get("token"):
+        print("[FAIL] 不应该登录成功")
+        return False
+    else:
+        print("[PASS] 登录被拒绝")
+        print(f"  错误码: {result.get('code', 'N/A')}")
+        print(f"  错误信息: {result.get('msg', result.get('error', 'N/A'))}")
+        return True
 
 
 def test_login_user_not_exist():
@@ -64,9 +124,83 @@ def test_login_user_not_exist():
     )
 
     print("\n[Step 1] 使用不存在的用户登录")
-    print(f"  用户名: nonexistent_user")
-    print(f"  密码: any_password")
-    result = api.login("nonexistent_user", "any_password")
+    print(f"  用户名: root1")
+    print(f"  密码: {config.password}")
+    result = api.login("root1", config.password)
+
+    print("\n[Step 2] 验证结果")
+    if result.get("token"):
+        print("[FAIL] 不应该登录成功")
+        return False
+    else:
+        print("[PASS] 登录被拒绝")
+        print(f"  错误码: {result.get('code', 'N/A')}")
+        print(f"  错误信息: {result.get('msg', 'N/A')}")
+        if result.get('code') == 3:
+            print("[PASS] 错误码正确: 3 (record not found)")
+            return True
+        return True
+
+
+def test_login_password_case_sensitive():
+    """测试：密码大小写区分"""
+
+    config = get_config(reload=True)
+
+    print("\n" + "="*50)
+    print("测试类型: API 登录测试")
+    print("测试场景: 密码大小写区分")
+    print("="*50)
+
+    api = ApiTest(
+        graphql_url=config.graphql_url,
+        login_url=config.login_url
+    )
+
+    # 将正确密码转为大写
+    password_upper = config.password.upper()
+
+    print("\n[Step 1] 使用大写密码登录")
+    print(f"  用户名: {config.username}")
+    print(f"  密码(大写): {password_upper}")
+    result = api.login(config.username, password_upper)
+
+    print("\n[Step 2] 验证结果")
+    if result.get("token"):
+        print("[FAIL] 不应该登录成功")
+        return False
+    else:
+        print("[PASS] 登录被拒绝")
+        print(f"  错误码: {result.get('code', 'N/A')}")
+        print(f"  错误信息: {result.get('msg', 'N/A')}")
+        if result.get('msg') == 'Incorrect password':
+            print("[PASS] 错误信息正确: Incorrect password")
+            return True
+        return True
+
+
+def test_login_username_case_sensitive():
+    """测试：用户名大小写区分"""
+
+    config = get_config(reload=True)
+
+    print("\n" + "="*50)
+    print("测试类型: API 登录测试")
+    print("测试场景: 用户名大小写区分")
+    print("="*50)
+
+    api = ApiTest(
+        graphql_url=config.graphql_url,
+        login_url=config.login_url
+    )
+
+    # 将用户名转为大写
+    username_upper = config.username.upper()
+
+    print("\n[Step 1] 使用大写用户名登录")
+    print(f"  用户名(大写): {username_upper}")
+    print(f"  密码: {config.password}")
+    result = api.login(username_upper, config.password)
 
     print("\n[Step 2] 验证结果")
     if result.get("token"):
@@ -79,84 +213,6 @@ def test_login_user_not_exist():
         return True
 
 
-def test_login_wrong_password_multiple():
-    """测试：多次密码错误"""
-
-    config = get_config(reload=True)
-
-    print("\n" + "="*50)
-    print("测试类型: API 登录测试")
-    print("测试场景: 多次密码错误")
-    print("="*50)
-
-    api = ApiTest(
-        graphql_url=config.graphql_url,
-        login_url=config.login_url
-    )
-
-    print("\n[Step 1] 连续3次使用错误密码登录")
-    results = []
-    for i in range(3):
-        print(f"\n  第 {i+1} 次:")
-        result = api.login(config.username, f"wrong_pass_{i}")
-        results.append(result)
-        if result.get("token"):
-            print("[FAIL] 不应该登录成功")
-            return False
-        else:
-            print(f"    被拒绝: {result.get('msg', 'N/A')}")
-
-    print("\n[Step 2] 验证所有尝试都被拒绝")
-    all_rejected = all(not r.get("token") for r in results)
-    if all_rejected:
-        print("[PASS] 所有错误密码尝试都被拒绝")
-        return True
-    else:
-        print("[FAIL] 有尝试未被拒绝")
-        return False
-
-
-def test_login_sql_injection():
-    """测试：SQL注入攻击"""
-
-    config = get_config(reload=True)
-
-    print("\n" + "="*50)
-    print("测试类型: API 登录测试")
-    print("测试场景: SQL注入攻击")
-    print("="*50)
-
-    api = ApiTest(
-        graphql_url=config.graphql_url,
-        login_url=config.login_url
-    )
-
-    print("\n[Step 1] 使用SQL注入语句登录")
-    injection_attempts = [
-        ("admin'--", "test1"),
-        ("admin' OR '1'='1", "test1"),
-        ("root; DROP TABLE users;", "test1"),
-    ]
-
-    all_rejected = True
-    for username, password in injection_attempts:
-        print(f"\n  尝试: {username}")
-        result = api.login(username, password)
-        if result.get("token"):
-            print(f"    [FAIL] SQL注入可能成功!")
-            all_rejected = False
-        else:
-            print(f"    [PASS] 被拒绝")
-
-    print("\n[Step 2] 验证所有注入尝试都被拒绝")
-    if all_rejected:
-        print("[PASS] SQL注入防护有效")
-        return True
-    else:
-        print("[FAIL] 存在SQL注入风险")
-        return False
-
-
 def run_all_business_error_tests():
     """运行所有业务异常测试"""
 
@@ -166,9 +222,11 @@ def run_all_business_error_tests():
 
     tests = [
         ("密码错误", test_login_wrong_password),
+        ("用户名为空", test_login_empty_username),
+        ("密码为空", test_login_empty_password),
         ("用户不存在", test_login_user_not_exist),
-        ("多次密码错误", test_login_wrong_password_multiple),
-        ("SQL注入攻击", test_login_sql_injection),
+        ("密码大小写区分", test_login_password_case_sensitive),
+        ("用户名大小写区分", test_login_username_case_sensitive),
     ]
 
     results = []

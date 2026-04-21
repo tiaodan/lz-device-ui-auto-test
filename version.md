@@ -3,3 +3,6 @@
 
 # v0.0.1.1
 api： login_error_normal.py 移除，不用测试相关用例
+
+# v0.0.1.2
+优化：api login_error_business.py ok
