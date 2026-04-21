@@ -190,6 +190,7 @@ def run_all_business_error_tests():
 
     passed_count = sum(1 for _, p in results if p)
     print(f"\n通过: {passed_count}/{len(results)}")
+    return passed_count == len(results)
 
 
 if __name__ == "__main__":

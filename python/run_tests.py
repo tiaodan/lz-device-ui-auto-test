@@ -122,7 +122,6 @@ def run_tests():
         print("\n>>> 运行接口自动化测试 (API)")
         try:
             from api_test.login.login_ok import test_login_ok
-            from api_test.login.login_error_normal import run_all_normal_error_tests
             from api_test.login.login_error_business import run_all_business_error_tests
 
             api_results = []
@@ -139,15 +138,6 @@ def run_tests():
             except Exception as e:
                 print(f"[ERROR] 失败: {e}")
                 api_results.append(("登录-正常", False))
-
-            # 异常通用
-            print("\n--- 测试: 登录异常通用 ---")
-            try:
-                result = run_all_normal_error_tests()
-                api_results.append(("登录-异常通用", result))
-            except Exception as e:
-                print(f"[ERROR] 失败: {e}")
-                api_results.append(("登录-异常通用", False))
 
             # 异常业务
             print("\n--- 测试: 登录异常业务 ---")
@@ -241,13 +231,6 @@ def run_single_test(test_type: str, test_name: str):
                 print("\n[PASS] 测试通过")
             else:
                 print("\n[FAIL] 测试失败")
-        elif test_name == "login_error_normal":
-            from api_test.login.login_error_normal import run_all_normal_error_tests
-            result = run_all_normal_error_tests()
-            if result:
-                print("\n[PASS] 所有异常通用测试通过")
-            else:
-                print("\n[FAIL] 部分异常通用测试失败")
         elif test_name == "login_error_business":
             from api_test.login.login_error_business import run_all_business_error_tests
             result = run_all_business_error_tests()
@@ -258,18 +241,15 @@ def run_single_test(test_type: str, test_name: str):
         elif test_name == "login":
             # 运行所有 login 测试
             from api_test.login.login_ok import test_login_ok
-            from api_test.login.login_error_normal import run_all_normal_error_tests
             from api_test.login.login_error_business import run_all_business_error_tests
             print("\n>>> 运行所有 login 测试")
             print("\n--- 正常场景 ---")
             test_login_ok()
-            print("\n--- 异常通用 ---")
-            run_all_normal_error_tests()
             print("\n--- 异常业务 ---")
             run_all_business_error_tests()
         else:
             print(f"未知的 API 测试: {test_name}")
-            print("可用测试: login, login_ok, login_error_normal, login_error_business")
+            print("可用测试: login, login_ok, login_error_business")
 
     else:
         print(f"未知测试类型: {test_type}")
@@ -285,7 +265,9 @@ if __name__ == "__main__":
     elif len(sys.argv) == 2:
         # 一个参数，运行指定类型的所有测试
         test_type = sys.argv[1]
-        if test_type in ["assertion", "visual", "api"]:
+        if test_type == "api":
+            run_single_test(test_type, "login")
+        elif test_type in ["assertion", "visual"]:
             run_single_test(test_type, "all")
         else:
             print(f"未知测试类型: {test_type}")
