@@ -31,40 +31,22 @@ def run_tests():
     if config.is_test_type_enabled("assertion"):
         print("\n>>> 运行断言测试 (Assertion)")
         try:
-            from assertion_test.test_login import (
-                test_login_page_elements,
-                test_login_slider_progress,
-                test_login_form_fill
-            )
+            from assertion_test.login.login_ok import test_login_ok
 
             assertion_results = []
 
-            # 测试页面元素
-            print("\n--- 测试: 页面元素验证 ---")
+            # 测试正常登录断言
+            print("\n--- 测试: 正常登录断言 ---")
             try:
-                test_login_page_elements()
-                assertion_results.append(("页面元素", True))
+                result = test_login_ok()
+                if result:
+                    print("\n[PASS] 测试通过")
+                else:
+                    print("\n[FAIL] 测试失败")
+                assertion_results.append(("登录-正常", result))
             except Exception as e:
-                print(f"失败: {e}")
-                assertion_results.append(("页面元素", False))
-
-            # 测试滑块进度
-            print("\n--- 测试: 滑块进度验证 ---")
-            try:
-                test_login_slider_progress()
-                assertion_results.append(("滑块进度", True))
-            except Exception as e:
-                print(f"失败: {e}")
-                assertion_results.append(("滑块进度", False))
-
-            # 测试表单填写
-            print("\n--- 测试: 表单填写验证 ---")
-            try:
-                test_login_form_fill()
-                assertion_results.append(("表单填写", True))
-            except Exception as e:
-                print(f"失败: {e}")
-                assertion_results.append(("表单填写", False))
+                print(f"[ERROR] 失败: {e}")
+                assertion_results.append(("登录-正常", False))
 
             results["assertion"] = assertion_results
 
@@ -189,18 +171,17 @@ def run_single_test(test_type: str, test_name: str):
     print(f"\n运行测试: {test_type}/{test_name}")
 
     if test_type == "assertion":
-        from assertion_test.test_login import (
-            test_login_page_elements,
-            test_login_slider_progress,
-            test_login_form_fill
-        )
+        from assertion_test.login.login_ok import test_login_ok
         tests = {
-            "elements": test_login_page_elements,
-            "slider": test_login_slider_progress,
-            "form": test_login_form_fill
+            "login_ok": test_login_ok,
+            "login": test_login_ok
         }
         if test_name in tests:
-            tests[test_name]()
+            result = tests[test_name]()
+            if result:
+                print("\n[PASS] 测试通过")
+            else:
+                print("\n[FAIL] 测试失败")
         else:
             print(f"未知的 assertion 测试: {test_name}")
 

@@ -4,9 +4,9 @@
 # ==================== 基础配置 ====================
 
 # 测试环境
-base_url: "https://192.168.85.238"
-login_url: "https://192.168.85.238/login"
-graphql_url: "https://192.168.85.238/rf/graphql"
+base_url: "https://192.168.85.246"
+login_url: "https://192.168.85.246/login"
+graphql_url: "https://192.168.85.246/rf/graphql"
 
 # 登录信息（请替换为真实账号）
 username: "root"
