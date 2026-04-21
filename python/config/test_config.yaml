@@ -1,0 +1,116 @@
+# 测试配置文件
+# 支持三种测试类型：assertion(断言)、visual(图片识别)、api(接口)
+
+# ==================== 基础配置 ====================
+
+# 测试环境
+base_url: "https://192.168.85.238"
+login_url: "https://192.168.85.238/login"
+graphql_url: "https://192.168.85.238/rf/graphql"
+
+# 登录信息（请替换为真实账号）
+username: "root"
+password: "lzno1root"    # 默认 lzno1root
+
+# SSL 配置（内网自签名证书）
+ignore_ssl_errors: true
+
+# 浏览器配置
+browser:
+  type: "chromium"  # chromium, firefox, webkit
+  headless: true   # true: 无头模式, false: 有头模式（可以看到操作）
+  slow_mo: 500      # 操作延迟(ms)，方便观察
+
+# ==================== 测试类型配置 ====================
+
+# 启用的测试类型（可组合）
+test_types:
+  - assertion  # 断言测试：元素、文本、属性验证
+  - visual     # 图片识别：截图对比、视觉回归
+  - api        # 接口测试：GraphQL API 验证
+
+# ==================== 断言测试配置 ====================
+
+assertion:
+  # 断言超时时间(ms)
+  timeout: 5000
+
+  # 重试次数
+  retries: 3
+
+  # 截图保存路径
+  screenshot_path: "screenshots/assertion"
+
+  # 失败时是否截图
+  screenshot_on_failure: true
+
+# ==================== 图片识别测试配置 ====================
+
+visual:
+  # 基准图保存路径
+  baseline_path: "screenshots/baseline"
+
+  # 当前截图保存路径
+  current_path: "screenshots/current"
+
+  # 差异图保存路径
+  diff_path: "screenshots/diff"
+
+  # 对比阈值（像素差异容忍度）
+  threshold: 0.1  # 0.1 表示 10% 差异
+
+  # 是否自动更新基准图
+  auto_update_baseline: false
+
+  # 对比区域（可选，默认全屏）
+  # regions:
+  #   - name: "login_button"
+  #     selector: ".lBtn"
+
+# ==================== 接口测试配置 ====================
+
+api:
+  # GraphQL 相关配置
+  login_mutation: true  # 是否先登录获取 token
+
+  # 请求超时(ms)
+  timeout: 30000
+
+  # 验证响应数据与 UI 一致性
+  verify_ui_consistency: true
+
+  # 常用查询接口
+  common_queries:
+    - "drone"
+    - "blacklist"
+    - "whitelist"
+    - "devices"
+
+# ==================== 测试用例配置 ====================
+
+test_cases:
+  # 登录测试
+  login:
+    enabled: true
+    types:
+      - assertion
+      - visual
+      - api
+    description: "登录功能测试"
+
+  # 无人机列表测试
+  drone_list:
+    enabled: false
+    types:
+      - assertion
+      - visual
+      - api
+    description: "无人机列表显示测试"
+
+  # 黑名单测试
+  blacklist:
+    enabled: false
+    types:
+      - assertion
+      - api
+    description: "黑名单添加/删除测试"

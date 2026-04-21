@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+
+# Playwright
+screenshots/current/
+screenshots/diff/
+screenshots/assertion/
+playwright-report/
+test-results/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Config (可能包含敏感信息)
+# config/test_config.yaml
