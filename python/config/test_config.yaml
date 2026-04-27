@@ -4,9 +4,9 @@
 # ==================== 基础配置 ====================
 
 # 测试环境
-base_url: "https://192.168.85.246"
-login_url: "https://192.168.85.246/login"
-graphql_url: "https://192.168.85.246/rf/graphql"
+base_url: "https://192.168.85.238"
+login_url: "https://192.168.85.238/login"
+graphql_url: "https://192.168.85.238/rf/graphql"
 
 # 登录信息（请替换为真实账号）
 username: "root"
@@ -18,8 +18,8 @@ ignore_ssl_errors: true
 # 浏览器配置
 browser:
   type: "chromium"  # chromium, firefox, webkit
-  headless: true   # true: 无头模式, false: 有头模式（可以看到操作）
-  slow_mo: 500      # 操作延迟(ms)，方便观察
+  headless: false   # true: 无头模式, false: 有头模式（可以看到操作）
+  slow_mo: 2000      # 操作延迟(ms)，方便观察。为了效率默认写500，为了自己看就写1000-2000
 
 # ==================== 测试类型配置 ====================
 

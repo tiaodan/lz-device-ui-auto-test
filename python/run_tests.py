@@ -172,9 +172,32 @@ def run_single_test(test_type: str, test_name: str):
 
     if test_type == "assertion":
         from assertion_test.login.login_ok import test_login_ok
+        from assertion_test.login.login_error_normal import (
+            test_password_visibility_toggle,
+            test_login_user_not_exist,
+            test_login_empty_username,
+            test_login_empty_password,
+            test_login_wrong_password,
+            test_login_without_slider,
+            test_login_slider_first,
+            test_login_password_case_sensitive,
+            test_login_username_case_sensitive,
+            run_all_normal_error_tests
+        )
+
         tests = {
             "login_ok": test_login_ok,
-            "login": test_login_ok
+            "login": test_login_ok,
+            "password_toggle": test_password_visibility_toggle,
+            "user_not_exist": test_login_user_not_exist,
+            "empty_username": test_login_empty_username,
+            "empty_password": test_login_empty_password,
+            "wrong_password": test_login_wrong_password,
+            "no_slider": test_login_without_slider,
+            "slider_first": test_login_slider_first,
+            "password_case": test_login_password_case_sensitive,
+            "username_case": test_login_username_case_sensitive,
+            "login_error_normal": run_all_normal_error_tests
         }
         if test_name in tests:
             result = tests[test_name]()
@@ -184,6 +207,7 @@ def run_single_test(test_type: str, test_name: str):
                 print("\n[FAIL] 测试失败")
         else:
             print(f"未知的 assertion 测试: {test_name}")
+            print("可用测试: login_ok, password_toggle, user_not_exist, empty_username, empty_password, wrong_password, no_slider, slider_first, password_case, username_case, login_error_normal")
 
     elif test_type == "visual":
         from visual_test.test_login import (

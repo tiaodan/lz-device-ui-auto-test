@@ -88,7 +88,7 @@ class VisualTest:
 
     def compare_images(self, name: str) -> dict:
         """
-        对比图片
+        对比图片（当前截图与同名基准图对比）
         返回: {
             "match": bool,           # 是否匹配
             "diff_percent": float,   # 差异百分比
@@ -102,6 +102,21 @@ class VisualTest:
         baseline_file = f"{self.baseline_path}/{name}.png"
         current_file = f"{self.current_path}/{name}.png"
         diff_file = f"{self.diff_path}/{name}.png"
+
+        return self._do_compare(baseline_file, current_file, diff_file)
+
+    def compare_with_baseline(self, current_name: str, baseline_name: str) -> dict:
+        """
+        对比当前截图与指定基准图（不同名称对比）
+        用于：异常状态截图与正常状态基准图对比
+        """
+        baseline_file = f"{self.baseline_path}/{baseline_name}.png"
+        current_file = f"{self.current_path}/{current_name}.png"
+        diff_file = f"{self.diff_path}/{current_name}_vs_{baseline_name}.png"
+
+        return self._do_compare(baseline_file, current_file, diff_file)
+
+    def _do_compare(self, baseline_file: str, current_file: str, diff_file: str) -> dict:
 
         # 检查文件存在
         if not os.path.exists(baseline_file):
