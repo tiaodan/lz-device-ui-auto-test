@@ -7,6 +7,8 @@ from playwright.sync_api import Page, expect, Locator
 from typing import Optional
 import os
 
+from utils.test_logger import get_default_logger
+
 
 class AssertionTest:
     """断言测试基类"""
@@ -14,6 +16,7 @@ class AssertionTest:
     def __init__(self, page: Page, screenshot_path: str = "screenshots/assertion"):
         self.page = page
         self.screenshot_path = screenshot_path
+        self.logger = get_default_logger()
         os.makedirs(screenshot_path, exist_ok=True)
 
     # ==================== 元素断言 ====================
@@ -128,15 +131,15 @@ class AssertionTest:
 
     def _log_pass(self, message: str):
         """记录通过的断言"""
-        print(f"[ASSERT PASS] {message}")
+        self.logger.pass_(message)
 
     def run_test(self, test_func: callable, name: str):
         """运行测试，失败时截图"""
         try:
             test_func()
-            print(f"[TEST PASS] {name}")
+            self.logger.pass_(name)
             return True
         except Exception as e:
-            print(f"[TEST FAIL] {name}: {e}")
+            self.logger.fail(f"{name}: {e}")
             self.screenshot_on_failure(f"{name}_failure")
             return False

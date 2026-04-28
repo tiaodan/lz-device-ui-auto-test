@@ -7,13 +7,14 @@ from graphql.graphql_client import GraphQLClient
 from playwright.sync_api import Page
 from typing import Dict, Any, Optional
 import json
+from utils.test_logger import get_default_logger
 
 
 class ApiTest:
     """接口测试基类 - 支持 Token 自动管理"""
 
     def __init__(self, graphql_url: str, login_url: str = "", username: str = "", password: str = "", page: Optional[Page] = None):
-        # 创建客户端，传入登录接口和用户名密码
+        self.logger = get_default_logger()
         self.client = GraphQLClient(
             base_url=graphql_url,
             login_url=login_url,
@@ -30,9 +31,9 @@ class ApiTest:
         result = self.client.login(username=username, password=password)
         if result.get("token"):
             self.token = result["token"]
-            print(f"[API] 登录成功，Token 已缓存")
+            self.logger.pass_("登录成功，Token 已缓存")
         else:
-            print(f"[API] 登录失败: {result}")
+            self.logger.fail(f"登录失败: {result}")
         return result
 
     def ensure_token(self) -> bool:
@@ -104,14 +105,12 @@ class ApiTest:
     # ==================== 数据一致性验证 ====================
 
     def verify_ui_data_consistency(self, ui_data: Any, api_data: Any, field_name: str = "") -> bool:
-        """
-        验证 UI 与 API 数据一致性
-        """
+        """验证 UI 与 API 数据一致性"""
         if ui_data == api_data:
-            print(f"[API PASS] {field_name}: UI与API数据一致")
+            self.logger.pass_(f"{field_name}: UI与API数据一致")
             return True
         else:
-            print(f"[API FAIL] {field_name}: UI={ui_data}, API={api_data}")
+            self.logger.fail(f"{field_name}: UI={ui_data}, API={api_data}")
             return False
 
     def verify_drone_count_consistency(self, ui_count: int) -> bool:
@@ -143,22 +142,22 @@ class ApiTest:
     def assert_response_success(self, response: Dict[str, Any]) -> bool:
         """断言响应成功"""
         if response.get("data"):
-            print(f"[API PASS] 响应成功")
+            self.logger.pass_("响应成功")
             return True
         elif response.get("errors"):
             errors = response["errors"]
-            print(f"[API FAIL] 响应错误: {errors[0]['message']}")
+            self.logger.fail(f"响应错误: {errors[0]['message']}")
             return False
         else:
-            print(f"[API FAIL] 响应格式异常")
+            self.logger.fail("响应格式异常")
             return False
 
     def assert_response_has_data(self, response: Dict[str, Any], field_name: str) -> bool:
         """断言响应包含指定字段"""
         if response.get("data") and response["data"].get(field_name):
-            print(f"[API PASS] 响应包含字段 '{field_name}'")
+            self.logger.pass_(f"响应包含字段 '{field_name}'")
             return True
-        print(f"[API FAIL] 响应缺少字段 '{field_name}'")
+        self.logger.fail(f"响应缺少字段 '{field_name}'")
         return False
 
     def assert_data_not_empty(self, response: Dict[str, Any], field_name: str) -> bool:
@@ -166,9 +165,9 @@ class ApiTest:
         if response.get("data") and response["data"].get(field_name):
             data = response["data"][field_name]
             if data and len(data) > 0:
-                print(f"[API PASS] '{field_name}' 数据非空")
+                self.logger.pass_(f"'{field_name}' 数据非空")
                 return True
-        print(f"[API FAIL] '{field_name}' 数据为空")
+        self.logger.fail(f"'{field_name}' 数据为空")
         return False
 
     # ==================== 辅助方法 ====================
@@ -187,20 +186,20 @@ class ApiTest:
     def _log_query(self, name: str, result: Dict[str, Any]):
         """记录查询"""
         if result.get("data"):
-            print(f"[API] Query '{name}' 成功")
+            self.logger.pass_(f"Query '{name}' 成功")
         else:
-            print(f"[API] Query '{name}' 失败")
+            self.logger.fail(f"Query '{name}' 失败")
 
     def _log_mutation(self, name: str, result: Dict[str, Any]):
         """记录操作"""
         if result.get("data"):
-            print(f"[API] Mutation '{name}' 成功")
+            self.logger.pass_(f"Mutation '{name}' 成功")
         else:
-            print(f"[API] Mutation '{name}' 失败")
+            self.logger.fail(f"Mutation '{name}' 失败")
 
     def save_response(self, name: str, response: Dict[str, Any]):
         """保存响应到文件"""
         path = f"screenshots/api/{name}.json"
         with open(path, "w", encoding="utf-8") as f:
             json.dump(response, f, indent=2, ensure_ascii=False)
-        print(f"[API] 响应保存: {path}")
+        self.logger.info(f"响应保存: {path}")

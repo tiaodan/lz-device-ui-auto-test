@@ -1,0 +1,16 @@
+[tool.pytest.ini_options]
+testpaths = ["assertion_test", "visual_test", "api_test"]
+python_files = ["test_*.py", "*_ok.py", "*_error*.py"]
+python_functions = ["test_*"]
+markers = [
+    "assertion: Assertion tests (element existence, state)",
+    "visual: Visual tests (screenshot comparison)",
+    "api: API tests (GraphQL endpoint validation)",
+    "login: Login related tests",
+    "slow: Slow running tests"
+]
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s [%(levelname)s] %(message)s"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+addopts = "-v --tb=short"

@@ -1,0 +1,6 @@
+# 登录模块 - English expectations
+
+username_placeholder: "Username"
+password_placeholder: "Password"
+login_button_text: "Sign in"
+slider_text_contains: "slide"

@@ -1,0 +1,6 @@
+# 登录模块 - 简体中文期望值
+
+username_placeholder: "用户名"
+password_placeholder: "密码"
+login_button_text: "登录"
+slider_text_contains: "滑块"

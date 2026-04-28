@@ -26,6 +26,16 @@ class Config:
     # ==================== 基础配置 ====================
 
     @property
+    def log_path(self) -> str:
+        """日志文件路径"""
+        return self._config.get("log_path", "logs")
+
+    @property
+    def log_level(self) -> str:
+        """日志级别"""
+        return self._config.get("log_level", "INFO")
+
+    @property
     def base_url(self) -> str:
         """测试环境 URL"""
         return self._config.get("base_url", "https://192.168.85.238")
@@ -190,6 +200,7 @@ class Config:
     def ensure_directories(self):
         """确保所有必要目录存在"""
         directories = [
+            self.log_path,
             self.assertion_screenshot_path,
             self.baseline_path,
             self.current_path,

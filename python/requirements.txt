@@ -12,11 +12,19 @@ pyyaml>=6.0
 # 图片处理（视觉测试）
 pillow>=10.0.0
 
-# 测试框架（可选）
+# 测试框架
 pytest>=7.4.0
 pytest-playwright>=0.4.0
-# pytest>=7.4.0
-# pytest-playwright>=0.4.0
 
-# 测试报告（待添加）
-# allure-pytest>=2.13.0
+# 日志框架
+loguru>=0.7.0
+
+# 测试报告
+pytest-html>=3.2.0
+allure-pytest>=2.13.0
+
+# 并行执行
+pytest-xdist>=3.5.0
+
+# 失败重试
+pytest-rerunfailures>=12.0

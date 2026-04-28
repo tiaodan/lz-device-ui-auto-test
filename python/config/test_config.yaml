@@ -3,6 +3,15 @@
 
 # ==================== 基础配置 ====================
 
+# 日志配置
+log_path: "python/logs"    # 日志文件保存目录
+log_level: "INFO"          # 日志级别：DEBUG, INFO, WARNING, ERROR
+
+# 语言配置（页面显示语言）
+# 可选值：zh_CN(简体中文), en_US(英文), fr_FR(法语), ru_RU(俄语),
+#         it_IT(意大利语), es_ES(西班牙语), ko_KR(韩语), ar_EG(阿拉伯语), th_TH(泰语)
+language: "zh_CN"
+
 # 测试环境
 base_url: "https://192.168.85.238"
 login_url: "https://192.168.85.238/login"
@@ -19,7 +28,7 @@ ignore_ssl_errors: true
 browser:
   type: "chromium"  # chromium, firefox, webkit
   headless: false   # true: 无头模式, false: 有头模式（可以看到操作）
-  slow_mo: 2000      # 操作延迟(ms)，方便观察。为了效率默认写500，为了自己看就写1000-2000
+  slow_mo: 1000      # 操作延迟(ms)，方便观察。为了效率默认写500，为了自己看就写1000-2000
 
 # ==================== 测试类型配置 ====================
 

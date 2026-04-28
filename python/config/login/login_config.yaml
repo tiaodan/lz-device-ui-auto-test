@@ -1,0 +1,37 @@
+# 登录模块配置
+# 包含定位器、测试数据
+# 期望值按语言拆分到独立文件：zh_CN.yaml, en_US.yaml 等
+
+# ==================== 定位器 ====================
+locators:
+  username_input: "#username"
+  password_input: "#password"
+  login_button: ".lBtn"
+  slider_container: ".drag"
+  slider_btn: ".drag .btn"
+  slider_progress: ".drag .progress"
+  slider_text: ".drag .text"
+  form: "form"
+  logo: ".signin-logo img, img[src*='logo']"
+  error_message: ".ui-message-error, [class*='error']"
+
+  # 语言切换相关
+  language_switch: ".topbarLocal"
+  language_popover: ".ui-popover-inner-content"
+  language_item: ".ui-popover-inner-content .ui-space-item"
+
+# ==================== 测试数据 ====================
+test_data:
+  # 有效数据
+  valid:
+    username: "root"
+    password: "lzno1root"
+
+  # 无效数据
+  invalid:
+    username_not_exist: "root1"
+    wrong_password: "lz"
+    empty_username: ""
+    empty_password: ""
+    uppercase_username: "ROOT"
+    uppercase_password: "LZNO1ROOT"
