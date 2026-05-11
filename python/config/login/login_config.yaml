@@ -12,13 +12,33 @@ locators:
   slider_progress: ".drag .progress"
   slider_text: ".drag .text"
   form: "form"
-  logo: ".signin-logo img, img[src*='logo']"
+  logo: ".signin-logo img, img[src*='/asset/logo-full.png']"   # 逗号分隔，表示种匹配任意一个
+  sys_name: ".signin-title"  # 系统名字
   error_message: ".ui-message-error, [class*='error']"
 
   # 语言切换相关
   language_switch: ".topbarLocal"
   language_popover: ".ui-popover-inner-content"
   language_item: ".ui-popover-inner-content .ui-space-item"
+
+# ==================== 描述名词 ====================
+# 用于测试日志输出，元素描述（不随语言切换）
+# 注意：测试步骤描述（如"验证页面元素可见性"）在 test_config.yaml 的 messages 里统一管理
+descriptions:
+  username_input: "用户名输入框"
+  password_input: "密码输入框"
+  login_button: "登录按钮"
+  slider_container: "滑块条"
+  slider_btn: "滑块拖动按钮"
+  slider_progress: "滑块进度条"
+  slider_text: "滑块提示文字"
+  form: "登录表单"
+  logo: "登录页Logo"
+  sys_name: "系统名字"
+  error_message: "错误提示"
+  language_switch: "语言切换按钮"
+  language_popover: "语言选择弹窗"
+  language_item: "语言选项"
 
 # ==================== 测试数据 ====================
 test_data:

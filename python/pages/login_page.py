@@ -4,7 +4,7 @@
 """
 
 from playwright.sync_api import Page, Locator, expect
-from config.module_config_loader import get_module_config, get_expectations
+from config.module_config_loader import get_module_config, get_expectations, get_descriptions
 
 
 class LoginPage:
@@ -24,6 +24,12 @@ class LoginPage:
         self._config = get_module_config("login")
         locators = self._config["locators"]
 
+        # 加载描述名词（不随语言切换）
+        self.desc = get_descriptions("login")
+
+        # 直接加载当前语言的期望值
+        self.exp = self.get_expectations(language)
+
         # 从配置初始化定位器
         self.username_input = page.locator(locators["username_input"])
         self.password_input = page.locator(locators["password_input"])
@@ -34,6 +40,7 @@ class LoginPage:
         self.slider_text = page.locator(locators["slider_text"])
         self.form = page.locator(locators["form"])
         self.logo = page.locator(locators["logo"])
+        self.sys_name = page.locator(locators["sys_name"])
         self.error_message = page.locator(locators["error_message"])
 
         # 语言切换相关定位器
@@ -115,7 +122,8 @@ class LoginPage:
 
     def click_login(self):
         """点击登录按钮"""
-        self.login_button.click()
+        # 用 JS 点击，避免 Playwright click() 不触发响应
+        self.page.evaluate("document.querySelector('.lBtn').click()")
 
     def wait_for_response(self, timeout: int = 3000):
         """等待响应"""
@@ -125,34 +133,74 @@ class LoginPage:
 
     def drag_slider(self):
         """拖动滑块验证码"""
-        self.page.evaluate("""() => {
+        # 等待滑块按钮可见
+        self.slider_btn.wait_for(state="visible", timeout=5000)
+
+        # 悬停到滑块按钮上
+        self.slider_btn.hover()
+
+        # 计算拖动距离（滑块容器宽度 - 按钮宽度）
+        drag_box = self.slider.bounding_box()
+        btn_box = self.slider_btn.bounding_box()
+
+        if not drag_box or not btn_box:
+            return False
+
+        # 目标位置
+        target_x = drag_box["width"] - btn_box["width"] - 10
+
+        # 使用 Playwright 的 drag_to 方法
+        # 创建一个虚拟目标元素来拖动到
+        self.page.evaluate(f"""() => {{
             const btn = document.querySelector('.drag .btn');
             const drag = document.querySelector('.drag');
-            const progress = document.querySelector('.drag .progress');
 
-            if (!btn || !drag || !progress) return false;
+            // 模拟真实拖动
+            const startX = btn.offsetLeft;
+            const startY = btn.offsetTop + btn.offsetHeight / 2;
 
-            const dragWidth = drag.offsetWidth;
-            const btnWidth = btn.offsetWidth;
-            const targetLeft = dragWidth - btnWidth - 10;
+            // 触发mousedown
+            btn.dispatchEvent(new MouseEvent('mousedown', {{
+                bubbles: true,
+                clientX: startX,
+                clientY: startY,
+                button: 0
+            }}));
 
-            const steps = 20;
-            for (let i = 0; i <= steps; i++) {
-                const currentLeft = (targetLeft / steps) * i;
-                btn.style.left = currentLeft + 'px';
-                progress.style.width = currentLeft + 'px';
-            }
+            // 分步移动，触发mousemove
+            const steps = 30;
+            const targetLeft = {target_x};
+            for (let i = 1; i <= steps; i++) {{
+                const currentLeft = startX + (targetLeft - startX) * i / steps;
+                const currentX = drag.offsetLeft + currentLeft + btn.offsetWidth / 2;
 
-            btn.style.left = targetLeft + 'px';
-            progress.style.width = targetLeft + 'px';
+                document.dispatchEvent(new MouseEvent('mousemove', {{
+                    bubbles: true,
+                    clientX: currentX,
+                    clientY: startY,
+                    button: 0
+                }}));
+            }}
 
-            btn.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
-            document.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: targetLeft }));
-            document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+            // 触发mouseup
+            document.dispatchEvent(new MouseEvent('mouseup', {{
+                bubbles: true,
+                clientX: drag.offsetLeft + targetLeft + btn.offsetWidth / 2,
+                clientY: startY,
+                button: 0
+            }}));
+        }}""")
 
-            return true;
-        }""")
-        self.page.wait_for_timeout(500)
+        self.page.wait_for_timeout(1000)
+
+        # 验证是否成功（检查文字）
+        text = self.slider_text.text_content()
+        return "验证成功" in text or "success" in text.lower()
+
+    def is_slider_verified(self) -> bool:
+        """检查滑块是否验证成功"""
+        text = self.slider_text.text_content()
+        return "验证成功" in text or "√" in text
 
     def get_slider_progress(self) -> str:
         """获取滑块进度"""

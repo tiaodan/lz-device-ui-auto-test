@@ -12,6 +12,53 @@ log_level: "INFO"          # 日志级别：DEBUG, INFO, WARNING, ERROR
 #         it_IT(意大利语), es_ES(西班牙语), ko_KR(韩语), ar_EG(阿拉伯语), th_TH(泰语)
 language: "zh_CN"
 
+# 测试日志描述（统一管理，用于 step、pass、warn、fail 等日志输出）
+messages:
+  # 第1类：元素可见性
+  step_1: "验证页面元素可见性"
+  all_element_visible: "所有元素可见"
+
+  # 第2类：元素属性
+  step_2: "验证元素属性"
+  attribute_passed: "属性验证通过"
+
+  # 第3类：行为
+  step_3: "第3类：行为（能操作吗？）显示/隐藏，点击，禁用"
+  button_text_passed: "元素行为验证通过"
+
+  # 第4类：滑块初始状态
+  step_4: "验证滑块初始状态"
+  slider_initial_correct: "滑块初始位置正确"
+  slider_initial_warn: "滑块初始位置可能不正确"
+
+  # 第5类：拖动滑块
+  step_5: "拖动滑块"
+  slider_unlocked: "滑块解锁成功"
+  slider_not_unlocked: "滑块未解锁"
+
+  # 第6类：填写表单
+  step_6: "填写表单"
+  form_filled_correct: "表单填写正确"
+  form_filled_wrong: "表单填写不正确"
+
+  # 第7类：点击登录
+  step_7: "点击登录按钮"
+  login_button_clicked: "登录按钮点击成功"
+
+  # 第8类：验证登录结果
+  step_8: "验证登录结果"
+  login_success: "登录成功，页面已跳转"
+  login_page_warn: "可能仍在登录页"
+
+  # 测试结果
+  test_all_passed: "登录断言测试全部通过"
+  test_partial_failed: "部分测试失败"
+
+# Mock 测试配置（元测试）
+mock:
+  # 是否暂停等待人工确认（调试时设为 true，生产测试设为 false）
+  pause_for_debug: false
+
 # 测试环境
 base_url: "https://192.168.85.238"
 login_url: "https://192.168.85.238/login"
@@ -28,7 +75,7 @@ ignore_ssl_errors: true
 browser:
   type: "chromium"  # chromium, firefox, webkit
   headless: false   # true: 无头模式, false: 有头模式（可以看到操作）
-  slow_mo: 1000      # 操作延迟(ms)，方便观察。为了效率默认写500，为了自己看就写1000-2000
+  slow_mo: 100      # 操作延迟(ms)，方便观察。为了效率默认写500，为了自己看就写1000-2000
 
 # ==================== 测试类型配置 ====================
 
@@ -47,11 +94,14 @@ assertion:
   # 重试次数
   retries: 3
 
-  # 截图保存路径
-  screenshot_path: "screenshots/assertion"
+  # 截图配置
+  screenshot_on_failure: true   # 失败时是否截图（pytest hook 自动实现）
+  screenshot_on_success: false  # 成功时是否截图（手动调用时配置控制）
 
-  # 失败时是否截图
-  screenshot_on_failure: true
+  # 截图保存路径（按模块分目录）
+  # 结构：screenshots/assertion/{module}/{test_name}.png
+  # 例如：screenshots/assertion/login/login_ok_result.png
+  screenshot_path: "screenshots/assertion"
 
 # ==================== 图片识别测试配置 ====================
 

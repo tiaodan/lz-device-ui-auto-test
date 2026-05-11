@@ -43,9 +43,9 @@ def setup_loguru(log_dir: str = "logs", level: str = "INFO"):
     return logger
 
 
-class TestLogger:
+class StepLogger:
     """
-    测试日志器封装类
+    步骤日志器封装类
     与原有 logger.py API 兼容
     """
 
@@ -99,7 +99,7 @@ _default_logger = None
 def init_default_logger(log_dir: str = "logs", level: str = "INFO"):
     """初始化默认日志器"""
     global _default_logger
-    _default_logger = TestLogger(log_dir, level)
+    _default_logger = StepLogger(log_dir, level)
     return _default_logger
 
 
@@ -107,5 +107,5 @@ def get_default_logger():
     """获取默认日志器"""
     global _default_logger
     if _default_logger is None:
-        _default_logger = TestLogger()
+        _default_logger = StepLogger()
     return _default_logger

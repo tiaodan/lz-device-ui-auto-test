@@ -65,6 +65,20 @@ class Config:
         """忽略 SSL 错误"""
         return self._config.get("ignore_ssl_errors", True)
 
+    @property
+    def language(self) -> str:
+        """页面显示语言"""
+        return self._config.get("language", "zh_CN")
+
+    @property
+    def messages(self) -> Dict[str, str]:
+        """测试日志描述（统一管理）"""
+        return self._config.get("messages", {})
+
+    def get_message(self, key: str, default: str = "") -> str:
+        """获取单个日志描述"""
+        return self.messages.get(key, default)
+
     # ==================== 浏览器配置 ====================
 
     @property
@@ -120,6 +134,11 @@ class Config:
         """失败时截图"""
         return self.assertion_config.get("screenshot_on_failure", True)
 
+    @property
+    def screenshot_on_success(self) -> bool:
+        """成功时截图"""
+        return self.assertion_config.get("screenshot_on_success", False)
+
     # ==================== 图片识别测试配置 ====================
 
     @property
@@ -173,6 +192,18 @@ class Config:
     def common_queries(self) -> List[str]:
         """常用查询接口"""
         return self.api_config.get("common_queries", ["drone", "blacklist", "whitelist"])
+
+    # ==================== Mock 测试配置 ====================
+
+    @property
+    def mock_config(self) -> Dict[str, Any]:
+        """Mock 测试配置"""
+        return self._config.get("mock", {})
+
+    @property
+    def mock_pause_for_debug(self) -> bool:
+        """Mock 测试是否暂停等待人工确认"""
+        return self.mock_config.get("pause_for_debug", False)
 
     # ==================== 测试用例配置 ====================
 

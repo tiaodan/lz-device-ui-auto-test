@@ -3,4 +3,11 @@
 username_placeholder: "Username"
 password_placeholder: "Password"
 login_button_text: "Sign in"
-slider_text_contains: "slide"
+slider_text: "slide to verify"  # 精确匹配
+
+# Logo 属性（精确匹配，写完整值）
+logo_alt: "Lizheng Tech"
+logo_src: "/asset/logo-full.png"  # 写完整路径
+
+# 系统名
+sys_name: "无人机防御系统"

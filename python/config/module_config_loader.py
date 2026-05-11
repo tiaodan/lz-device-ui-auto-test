@@ -126,6 +126,18 @@ def get_locators(module_name: str) -> dict:
     return config["locators"]
 
 
+def get_descriptions(module_name: str) -> dict:
+    """获取描述名词配置"""
+    config = get_module_config(module_name)
+    return config.get("descriptions", {})
+
+
+def get_description(module_name: str, description_name: str) -> str:
+    """获取单个描述名词"""
+    descriptions = get_descriptions(module_name)
+    return descriptions.get(description_name, description_name)
+
+
 def get_locator(module_name: str, locator_name: str) -> str:
     """获取单个定位器"""
     locators = get_locators(module_name)

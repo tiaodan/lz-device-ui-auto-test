@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from config.config_loader import get_config, Config
 from config.module_config_loader import get_module_config, get_expectations
 from pages.login_page import LoginPage
-from utils.test_logger import TestLogger, init_default_logger
+from utils.test_logger import StepLogger, init_default_logger
 
 # 登录状态文件路径
 STORAGE_STATE_FILE = "auth_state.json"
@@ -57,9 +57,10 @@ def browser_context_args(config):
 @pytest.fixture(scope="session")
 def browser_type_launcher_args(config):
     """浏览器启动参数"""
-    return {
-        "headless": config.headless,
-    }
+    args = {"headless": config.headless}
+    if config.slow_mo > 0:
+        args["slow_mo"] = config.slow_mo
+    return args
 
 
 @pytest.fixture(scope="session")
@@ -85,7 +86,7 @@ def saved_auth_state(launch_browser, browser_context_args, config, login_config,
     page = context.new_page()
 
     page.goto(config.base_url, wait_until="load")
-    page.wait_for_timeout(1000)
+    page.wait_for_timeout(300)
 
     login_page = LoginPage(page)
     test_data = login_config["test_data"]["valid"]
@@ -112,8 +113,12 @@ def fresh_page(browser, config, test_logger, language):
         Object.defineProperty(document, 'lanType', {{ value: '{language}', writable: true }});
     """)
     page = context.new_page()
-    page.goto(config.base_url, wait_until="load")
-    page.wait_for_timeout(1000)
+    # 导航到根目录（登录页可能在根目录）
+    page.goto(config.base_url, wait_until="networkidle")
+    # 打印实际URL（调试）
+    test_logger.info(f"fresh_page导航后URL: {page.url}")
+    # 等登录按钮出现
+    page.wait_for_selector(".lBtn", timeout=10000)
     yield page
     context.close()
 
@@ -132,8 +137,8 @@ def page(browser, config, test_logger, saved_auth_state, language):
         Object.defineProperty(document, 'lanType', {{ value: '{language}', writable: true }});
     """)
     page = context.new_page()
-    page.goto(config.base_url, wait_until="load")
-    page.wait_for_timeout(1000)
+    page.goto(config.base_url, wait_until="domcontentloaded")
+    page.wait_for_timeout(500)  # 已登录页面不需要等特定元素
     yield page
     context.close()
 
@@ -145,10 +150,17 @@ def login_page(fresh_page, language):
 
 
 @pytest.fixture
-def assertion_test(page, config):
-    """断言测试 fixture"""
+def assertion_test_logged(page, config):
+    """断言测试 fixture（已登录状态）"""
     from assertion_test.base import AssertionTest
     return AssertionTest(page, screenshot_path=config.assertion_screenshot_path)
+
+
+@pytest.fixture
+def assertion_test_not_logged(fresh_page, config):
+    """断言测试 fixture（未登录状态，用于登录页测试）"""
+    from assertion_test.base import AssertionTest
+    return AssertionTest(fresh_page, screenshot_path=config.assertion_screenshot_path)
 
 
 @pytest.fixture

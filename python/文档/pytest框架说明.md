@@ -84,12 +84,63 @@ addopts = "-v --tb=short"
 |--------|------|-----|
 | `config` | session | 配置对象 |
 | `test_logger` | session | loguru 日志器 |
-| `page` | function | Playwright page，自动导航登录页 |
+| `page` | function | Playwright page，已登录状态 |
+| `fresh_page` | function | Playwright page，未登录状态（全新页面） |
 | `login_page` | function | 登录页面对象 |
-| `assertion_test` | function | 断言测试基类 |
+| `assertion_test_logged` | function | 断言测试基类（已登录状态） |
+| `assertion_test_not_logged` | function | 断言测试基类（未登录状态） |
 | `visual_test` | function | 视觉测试基类 |
 | `api_test` | function | API测试基类 |
-| `logged_in_page` | function | 已登录的 page |
+
+### Fixture 自动注入机制
+
+pytest 通过**参数名匹配**自动注入 fixture：
+
+```python
+# conftest.py 定义 fixture
+@pytest.fixture
+def login_page(page, language):
+    return LoginPage(page, language=language)
+
+# 测试函数参数名 = fixture 名
+def test_login_ok(login_page, assertion_test_not_logged, test_logger, config):
+    # pytest 自动找到同名 fixture，执行后注入
+    # 不需要手动创建，直接用就行
+```
+
+**链路：**
+```
+test_login_ok(参数名: login_page)
+    ↓ pytest 找同名 fixture
+conftest.py: def login_page(...)
+    ↓ 执行 fixture 函数
+return LoginPage(page)
+    ↓ 注入到测试函数
+test_login_ok 直接用 login_page 对象
+```
+
+**要点：**
+- 参数名必须和 fixture 名完全一致
+- pytest 自动执行 fixture，不需要调用
+- fixture 可以依赖其他 fixture（链式注入）
+- 测试文件里看不到定义，因为定义在 conftest.py
+
+### Docstring 标准写法
+
+函数开头的 `"""xxx"""` 是 Python 标准文档字符串：
+
+```python
+def test_login_ok(login_page, config):
+    """测试：正常登录 - 用户名+密码+滑块验证"""  # ← docstring（标准位置）
+    test_logger.section("断言测试")
+```
+
+**作用：**
+- pytest `-v` 输出会显示这个描述
+- IDE 鼠标悬停显示文档
+- `help(函数名)` 会显示
+
+**不是写在"里面"，而是函数定义后的第一行，这是 Python 规定。**
 
 ## pytest Hooks
 
@@ -117,7 +168,7 @@ def pytest_runtest_makereport(item, call):
 **API兼容**：
 ```python
 # utils/test_logger.py
-class TestLogger:
+class StepLogger:
     def step(self, step_num: int, message: str)  # 测试步骤
     def pass_(self, message: str)                # 通过
     def fail(self, message: str)                 # 失败

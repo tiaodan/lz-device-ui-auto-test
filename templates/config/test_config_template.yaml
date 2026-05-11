@@ -1,0 +1,43 @@
+# 测试配置文件模板
+# 复制后修改：URL、账号、语言等
+
+# ==================== 基础配置 ====================
+base_url: "https://192.168.1.100"
+username: "root"
+password: "your_password"
+language: "zh_CN"          # zh_CN / en_US
+ignore_ssl_errors: true    # 测试环境通常需要忽略
+
+# ==================== 浏览器配置 ====================
+browser:
+  type: chromium           # chromium / firefox / webkit
+  headless: true           # 无头模式
+  slow_mo: 0               # 操作延迟(ms)，调试时可设为 100
+
+# ==================== 路径配置 ====================
+screenshot_path: "screenshots"
+log_path: "logs"
+log_level: "INFO"
+
+# ==================== 测试类型 ====================
+test_types:
+  - assertion              # 断言测试
+  - visual                 # 视觉测试
+  - api                    # 接口测试
+
+# ==================== 断言测试配置 ====================
+assertion:
+  timeout: 5000
+  screenshot_on_failure: true
+
+# ==================== 视觉测试配置 ====================
+visual:
+  threshold: 0.1           # 10% 差异容忍度
+  baseline_path: "screenshots/baseline"
+  current_path: "screenshots/current"
+  diff_path: "screenshots/diff"
+
+# ==================== 接口测试配置 ====================
+api:
+  graphql_url: "https://192.168.1.100/api/graphql"
+  timeout: 30000

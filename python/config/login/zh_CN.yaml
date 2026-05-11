@@ -3,4 +3,11 @@
 username_placeholder: "用户名"
 password_placeholder: "密码"
 login_button_text: "登录"
-slider_text_contains: "滑块"
+slider_text: "请拖动滑块进行验证"  # 精确匹配，不要用 contains
+
+# Logo 属性（精确匹配，写完整值）
+logo_alt: "历正科技"
+logo_src: "/asset/logo-full.png"  # 写完整路径，测得最准
+
+# 系统名
+sys_name: "无人机防御系统"
